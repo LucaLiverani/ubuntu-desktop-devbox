@@ -1,0 +1,63 @@
+---
+- name: Remove old Docker packages
+  apt:
+    name:
+      - docker
+      - docker.io
+      - docker-engine
+      - containerd
+      - runc
+    state: absent
+  ignore_errors: true
+
+- name: Fetch Docker GPG key (ASCII)
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+
+- name: Convert Docker key to keyring (dearmor)
+  shell: |
+    set -e
+    if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
+      gpg --dearmor < /etc/apt/keyrings/docker.asc > /etc/apt/keyrings/docker.gpg
+      chmod 0644 /etc/apt/keyrings/docker.gpg
+    fi
+  args:
+    executable: /bin/bash
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: "deb [arch={{ ansible_architecture | default('amd64') }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+
+- name: Install Docker CE + plugins
+  apt:
+    update_cache: true
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  notify: Restart Docker
+
+- name: Ensure docker group exists
+  group:
+    name: docker
+    state: present
+
+- name: Add local user(s) to docker group
+  user:
+    name: "{{ item }}"
+    append: true
+    groups: docker
+  loop: "{{ docker_users }}"
+
+- name: Enable and start Docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started

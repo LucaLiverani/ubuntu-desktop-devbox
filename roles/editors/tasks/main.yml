@@ -1,0 +1,39 @@
+---
+# VS Code via Microsoft repository
+- name: Fetch Microsoft GPG key (ASCII)
+  get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /etc/apt/keyrings/microsoft.asc
+    mode: "0644"
+
+- name: Convert Microsoft key to keyring (dearmor)
+  shell: |
+    set -e
+    if [ ! -f /etc/apt/keyrings/microsoft.gpg ]; then
+      gpg --dearmor < /etc/apt/keyrings/microsoft.asc > /etc/apt/keyrings/microsoft.gpg
+      chmod 0644 /etc/apt/keyrings/microsoft.gpg
+    fi
+  args:
+    executable: /bin/bash"
+
+- name: Add VS Code repository
+  apt_repository:
+    repo: "deb [arch={{ ansible_architecture | default('amd64') }} signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+    filename: vscode
+    state: present
+
+- name: Install VS Code
+  apt:
+    name: code
+    state: present
+    update_cache: true
+
+- name: Install VS Code extensions (as desktop user)
+  become: false
+  shell: |
+    set -e
+    for ext in {{ vscode_extensions | join(' ') }}; do
+      code --install-extension "$ext" --force || true
+    done
+  args:
+    executable: /bin/bash

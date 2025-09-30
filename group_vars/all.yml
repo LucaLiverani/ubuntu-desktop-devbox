@@ -1,0 +1,36 @@
+# Basic system
+timezone: "Etc/UTC"
+upgrade_dist: false
+
+common_packages:
+  - git
+  - curl
+  - wget
+  - unzip
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - htop
+  - ripgrep
+  - jq
+  - build-essential
+  - apt-transport-https
+  - software-properties-common
+
+# Python
+python_packages:
+  - python3
+  - python3-pip
+  - python3-venv
+  - pipx
+
+# Docker
+docker_users:
+  - "{{ ansible_env.USER | default(ansible_user_id) }}"
+
+# VS Code
+vscode_extensions:
+  - ms-python.python
+  - ms-toolsai.jupyter
+  - ms-azuretools.vscode-docker
+  - redhat.vscode-yaml

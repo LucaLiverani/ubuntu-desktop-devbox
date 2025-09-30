@@ -1,0 +1,11 @@
+- name: Minimal Dev Setup (Ubuntu 24.04 Desktop)
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: common
+    - role: python
+    - role: docker
+    - role: editors
