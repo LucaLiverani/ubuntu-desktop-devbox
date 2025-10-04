@@ -16,6 +16,7 @@ common_packages:
   - build-essential
   - apt-transport-https
   - software-properties-common
+  - tree
 
 # Python
 python_packages:

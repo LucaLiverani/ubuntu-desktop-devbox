@@ -8,6 +8,4 @@
 - name: Ensure pipx path for current user
   become: false
   shell: pipx ensurepath
-  args:
-    executable: /bin/bash
   changed_when: false
