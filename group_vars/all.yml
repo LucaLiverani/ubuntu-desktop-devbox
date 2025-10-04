@@ -28,10 +28,3 @@ python_packages:
 # Docker
 docker_users:
   - "{{ ansible_env.USER | default(ansible_user_id) }}"
-
-# VS Code
-vscode_extensions:
-  - ms-python.python
-  - ms-toolsai.jupyter
-  - ms-azuretools.vscode-docker
-  - redhat.vscode-yaml

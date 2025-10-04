@@ -7,4 +7,5 @@
   roles:
     - role: common
     - role: python
+    - role: nodejs
     - role: docker
